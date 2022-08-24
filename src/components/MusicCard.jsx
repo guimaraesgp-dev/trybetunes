@@ -3,11 +3,17 @@ import PropTypes from 'prop-types';
 
 class MusicCard extends Component {
   render() {
-    const { music } = this.props;
+    const { music,
+      previewUrl,
+      trackId,
+      fetchToFavorite,
+      songObj,
+      checked,
+    } = this.props;
     return (
       <div>
         <p>{music.trackName}</p>
-        <audio data-testid="audio-component" src={ music.previewUrl } controls>
+        <audio data-testid="audio-component" src={ previewUrl } controls>
           <track kind="captions" />
           O seu navegador não suporta o elemento
           {' '}
@@ -15,15 +21,28 @@ class MusicCard extends Component {
           <code>audio</code>
           .
         </audio>
+        <label htmlFor="favorite">
+          Favorita
+          <input
+            type="checkbox"
+            name="favoriteCheck"
+            id="favorite"
+            checked={ checked }
+            onChange={ () => fetchToFavorite(songObj) }
+            data-testid={ `checkbox-music-${trackId}` }
+          />
+        </label>
       </div>
     );
   }
 }
 
 MusicCard.propTypes = {
-  music: PropTypes.shape({
-    trackName: PropTypes.string,
-    previewUrl: PropTypes.string,
-  }).isRequired,
+  music: PropTypes.string.isRequired,
+  previewUrl: PropTypes.string.isRequired,
+  trackId: PropTypes.string.isRequired,
+  fetchToFavorite: PropTypes.func.isRequired,
+  songObj: PropTypes.objectOf(PropTypes.string).isRequired,
+  checked: PropTypes.bool.isRequired,
 };
 export default MusicCard;

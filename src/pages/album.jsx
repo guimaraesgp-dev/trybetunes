@@ -4,12 +4,14 @@ import Header from '../components/Header';
 import Loading from '../components/Loading';
 import MusicCard from '../components/MusicCard';
 import getMusics from '../services/musicsAPI';
+import { addSong } from '../services/favoriteSongsAPI';
 
 class album extends Component {
   state = {
     infoAlbum: {},
     musicList: [],
     loading: false,
+    songFavorite: [],
   }
 
   async componentDidMount() {
@@ -27,8 +29,19 @@ class album extends Component {
     this.setState({ loading: false });
   }
 
+  fetchToFavorite = async (obj) => {
+    const { songFavorite } = this.state;
+    this.setState({ loading: true });
+    const result = await addSong(obj);
+    console.log(result);
+    this.setState({
+      loading: false,
+      songFavorite: [...songFavorite, obj.trackId],
+    });
+  }
+
   render() {
-    const { infoAlbum, musicList, loading } = this.state;
+    const { infoAlbum, musicList, loading, songFavorite } = this.state;
     return (
       <div data-testid="page-album">
         <Header />
@@ -40,6 +53,11 @@ class album extends Component {
               {musicList.map((music) => (<MusicCard
                 key={ music.trackId }
                 music={ music }
+                previewUrl={ music.previewUrl }
+                trackId={ music.trackId }
+                checked={ songFavorite.some((favSong) => music.trackId === favSong) }
+                fetchToFavorite={ this.fetchToFavorite }
+                songObj={ music }
               />))}
             </section>
           </div>
