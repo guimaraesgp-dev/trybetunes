@@ -22,14 +22,14 @@ class MusicCard extends Component {
           .
         </audio>
         <label htmlFor="favorite">
-          Favorita
+          Musicas Favoritas
           <input
             type="checkbox"
             name="favoriteCheck"
             id="favorite"
-            checked={ checked }
-            onChange={ () => fetchToFavorite(songObj) }
             data-testid={ `checkbox-music-${trackId}` }
+            checked={ checked }
+            onChange={ (e) => fetchToFavorite(e, songObj) }
           />
         </label>
       </div>
