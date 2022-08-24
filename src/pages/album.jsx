@@ -4,14 +4,14 @@ import Header from '../components/Header';
 import Loading from '../components/Loading';
 import MusicCard from '../components/MusicCard';
 import getMusics from '../services/musicsAPI';
-import { addSong } from '../services/favoriteSongsAPI';
+import { addSong, getFavoriteSongs } from '../services/favoriteSongsAPI';
 
 class album extends Component {
   state = {
     infoAlbum: {},
     musicList: [],
     loading: false,
-    songFavorite: [],
+    songFavoriteId: [],
   }
 
   async componentDidMount() {
@@ -19,6 +19,7 @@ class album extends Component {
     const { musicList } = this.state;
     this.setState({ loading: true });
     const data = await getMusics(id);
+    this.getFromFavorite();
     data.forEach((item, index) => {
       if (index === 0) {
         this.setState({ infoAlbum: item });
@@ -30,18 +31,27 @@ class album extends Component {
   }
 
   fetchToFavorite = async (obj) => {
-    const { songFavorite } = this.state;
+    const { songFavoriteId } = this.state;
     this.setState({ loading: true });
-    const result = await addSong(obj);
-    console.log(result);
+    await addSong(obj);
     this.setState({
       loading: false,
-      songFavorite: [...songFavorite, obj.trackId],
+      songFavoriteId: [...songFavoriteId, obj.trackId],
+    });
+  }
+
+  getFromFavorite = async () => {
+    const { songFavoriteId } = this.state;
+    this.setState({ loading: true });
+    const result = await getFavoriteSongs();
+    this.setState({
+      loading: false,
+      songFavoriteId: [...songFavoriteId, ...result.map((music) => music.trackId)],
     });
   }
 
   render() {
-    const { infoAlbum, musicList, loading, songFavorite } = this.state;
+    const { infoAlbum, musicList, loading, songFavoriteId } = this.state;
     return (
       <div data-testid="page-album">
         <Header />
@@ -55,7 +65,7 @@ class album extends Component {
                 music={ music }
                 previewUrl={ music.previewUrl }
                 trackId={ music.trackId }
-                checked={ songFavorite.some((favSong) => music.trackId === favSong) }
+                checked={ songFavoriteId.some((favSong) => music.trackId === favSong) }
                 fetchToFavorite={ this.fetchToFavorite }
                 songObj={ music }
               />))}
